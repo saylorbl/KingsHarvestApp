@@ -1,55 +1,92 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, StatusBar, TextInput, Keyboard, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import Payment from "@/components/Payment";
+import {StripeProvider} from "@stripe/stripe-react-native";
+import {useUser} from "@clerk/clerk-expo"
 
 const Donation = () => {
     const router = useRouter();
     const [amount, setAmount] = useState('');
+    const { user, isLoaded } = useUser();
+
+    // Debug logs
+    useEffect(() => {
+        if (isLoaded) {
+            console.log("👤 User loaded:");
+            console.log("Full Name:", user?.fullName);
+            console.log("First Name:", user?.firstName);
+            console.log("Last Name:", user?.lastName);
+            console.log("Email:", user?.emailAddresses[0]?.emailAddress);
+        }
+    }, [isLoaded, user]);
+
+    //Construct a name from available data
+    const getUserName = () => {
+        if (user?.fullName) return user.fullName;
+        if (user?.firstName && user?.lastName) return `${user.firstName} ${user.lastName}`;
+        if (user?.firstName) return user.firstName;
+        if (user?.emailAddresses[0]?.emailAddress) {
+            // Fallback: use email username as name
+            return user.emailAddresses[0].emailAddress.split('@')[0];
+        }
+        return "Anonymous Donor";
+    };
+
+    if (!isLoaded) {
+        return (
+            <ImageBackground
+                source={require('@/assets/images/background.jpg')}
+                style={styles.background}
+            >
+                <View style={styles.content}>
+                    <Text style={styles.title}>Loading...</Text>
+                </View>
+            </ImageBackground>
+        );
+    }
 
     return (
-        <ImageBackground
-            source={require('@/assets/images/background.jpg')}
-            style={styles.background}
-        >
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => router.back()}
-                accessibilityRole="button"
-                accessibilityLabel="Go back"
+        <StripeProvider
+        publishableKey={String(process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY!)}
+        merchantIdentifier={"merchant.kingsharvest.com"}
+        urlScheme={"kingsharvest"}>
+            <ImageBackground
+                source={require('@/assets/images/background.jpg')}
+                style={styles.background}
             >
-                <Text style={styles.backButtonText}>← Back</Text>
-            </TouchableOpacity>
-            <View style={styles.content}>
-                <Text style={styles.title}>Thank you for giving!</Text>
-                <View style={styles.inputContainer}>
-                    <Text style={styles.dollarSign}>$</Text>
-                    <TextInput
-                        style={styles.amountInput}
-                        placeholder="0.00"
-                        placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                        keyboardType="decimal-pad"
-                        returnKeyType="done"
-                        value={amount}
-                        onChangeText={setAmount}
-                        onSubmitEditing={() => Keyboard.dismiss()}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => router.back()}
+                    accessibilityRole="button"
+                    accessibilityLabel="Go back"
+                >
+                    <Text style={styles.backButtonText}>← Back</Text>
+                </TouchableOpacity>
+                <View style={styles.content}>
+                    <Text style={styles.title}>Thank you for giving!</Text>
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.dollarSign}>$</Text>
+                        <TextInput
+                            style={styles.amountInput}
+                            placeholder="0.00"
+                            placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                            keyboardType="decimal-pad"
+                            returnKeyType="done"
+                            value={amount}
+                            onChangeText={setAmount}
+                            onSubmitEditing={() => Keyboard.dismiss()}
+                        />
+                    </View>
+                    <Payment
+                        amountPaid={amount}
+                        fullName={getUserName()}
+                        email={user?.emailAddresses[0].emailAddress || ""}
                     />
                 </View>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => {
-                        if (!amount || parseFloat(amount) <= 0) {
-                            Alert.alert('Whoops!', 'Please enter the amount you wish to donate');
-                        } else {
-                            console.log(`Paid ${amount}`);
-                        }
-                    }}
-                    accessibilityRole="button"
-                >
-                    <Text style={styles.buttonText}>Next</Text>
-                </TouchableOpacity>
-            </View>
-            <StatusBar barStyle="light-content" />
-        </ImageBackground>
+                <StatusBar barStyle="light-content" />
+            </ImageBackground>
+        </StripeProvider>
     )
 }
 

@@ -1,4 +1,4 @@
-import {Animated, View, Text, StyleSheet, TouchableOpacity, StatusBar} from "react-native";
+import {View, Text, StyleSheet, TouchableOpacity, StatusBar} from "react-native";
 import {useRouter} from "expo-router";
 import {ImageBackground} from "expo-image";
 
