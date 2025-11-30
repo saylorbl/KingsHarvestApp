@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, TouchableOpacity, StatusBar} from "react-native";
+import {View, Text, StyleSheet, TouchableOpacity, StatusBar, Linking} from "react-native";
 import {useRouter} from "expo-router";
 import {ImageBackground} from "expo-image";
 
@@ -18,6 +18,13 @@ const Welcome = () => {
                     accessibilityRole="button"
                 >
                     <Text style={styles.buttonText}>Offering</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => Linking.openURL("https://thekingsharvestchurch.org/")}
+                    accessibilityRole="button"
+                >
+                    <Text style={styles.buttonText}>Website</Text>
                 </TouchableOpacity>
             </View>
             <StatusBar barStyle="light-content" />
