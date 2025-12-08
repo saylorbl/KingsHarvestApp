@@ -9,7 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.fullstackKingsHarvest",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "The app can use the camera as a potential payment option"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,10 +26,6 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.fullstackKingsHarvest"
-    },
-    "web": {
-      "output": "server",
-      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       [
@@ -49,6 +50,14 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://kingsharvest.com/"
+      },
+      "eas": {
+        "projectId": "2d54a34c-a23f-46a5-90d1-9768dec653cd"
+      }
     }
   }
 }
